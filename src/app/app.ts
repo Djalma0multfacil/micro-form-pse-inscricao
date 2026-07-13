@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { BuscarEnderecoPorCepUseCase } from './core/use-cases/buscar-endereco-por-cep.use-case';
 import { CepAddress } from './shared/models/cep-address.model';
 import { RuntimeConfigStore } from './infrastructure/runtime/runtime-config.store';
+import { SmartFormComponent, SmartFormValue } from './features/smart-form/smart-form.component';
 
 @Component({
   selector: 'micro-formulario-inscricao',
-  imports: [CommonModule],
+  imports: [CommonModule, SmartFormComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -17,6 +18,7 @@ export class App {
   readonly authToken = input<string | undefined>(undefined);
   readonly processoId = input<string | undefined>(undefined);
   readonly inscricaoUuid = input<string | undefined>(undefined);
+  readonly actionSubmit = output<SmartFormValue>();
 
   protected readonly cep = signal('');
   protected readonly endereco = signal<CepAddress | null>(null);
@@ -57,6 +59,10 @@ export class App {
     } finally {
       this.carregandoCep.set(false);
     }
+  }
+
+  protected onActionSubmit(value: SmartFormValue): void {
+    this.actionSubmit.emit(value);
   }
 
   private parseProcessoId(value: string | undefined): number | undefined {

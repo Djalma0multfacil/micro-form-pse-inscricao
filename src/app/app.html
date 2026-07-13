@@ -1,8 +1,10 @@
 <section class="shell" aria-label="Micro Formulario de Inscricao">
   <header class="header">
     <h1>Micro Formulario de Inscricao</h1>
-    <p>Base tecnica com Angular Standalone, Web Component e adaptadores HTTP.</p>
+    <p>Fluxo Smart/Dumb com formulario reativo standalone.</p>
   </header>
+
+  <app-smart-form [modo]="modo()" (actionSubmit)="onActionSubmit($event)" />
 
   <div class="grid">
     <article class="card">
@@ -31,14 +33,14 @@
       </button>
 
       @if (endereco(); as enderecoAtual) {
-      <div class="feedback success">
-        <strong>Endereco:</strong>
-        <span>{{ enderecoAtual.logradouro }}, {{ enderecoAtual.bairro }} - {{ enderecoAtual.localidade }}/{{ enderecoAtual.uf }}</span>
-      </div>
+        <div class="feedback success">
+          <strong>Endereco:</strong>
+          <span>{{ enderecoAtual.logradouro }}, {{ enderecoAtual.bairro }} - {{ enderecoAtual.localidade }}/{{ enderecoAtual.uf }}</span>
+        </div>
       }
 
       @if (erroCep()) {
-      <div class="feedback error">{{ erroCep() }}</div>
+        <div class="feedback error">{{ erroCep() }}</div>
       }
     </article>
   </div>

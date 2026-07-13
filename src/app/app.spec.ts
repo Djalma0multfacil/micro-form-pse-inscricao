@@ -58,4 +58,57 @@ describe('App', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h1')?.textContent).toContain('Micro Formulario de Inscricao');
   });
+
+  it('should emit actionSubmit when the smart form is valid', async () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance;
+    let emitted: unknown;
+    component.actionSubmit.subscribe((value) => {
+      emitted = value;
+    });
+
+    const host = fixture.nativeElement as HTMLElement;
+    const nome = host.querySelector<HTMLInputElement>('#nome');
+    const email = host.querySelector<HTMLInputElement>('#email');
+    const documento = host.querySelector<HTMLInputElement>('#documento');
+    const saveButton = host.querySelector<HTMLButtonElement>('.save-button');
+
+    expect(nome).not.toBeNull();
+    expect(email).not.toBeNull();
+    expect(documento).not.toBeNull();
+    expect(saveButton).not.toBeNull();
+
+    nome!.value = 'Maria da Silva';
+    nome!.dispatchEvent(new Event('input'));
+
+    email!.value = 'maria@example.com';
+    email!.dispatchEvent(new Event('input'));
+
+    documento!.value = '12345678900';
+    documento!.dispatchEvent(new Event('input'));
+
+    fixture.detectChanges();
+    saveButton!.click();
+
+    expect(emitted).toEqual({
+      nome: 'Maria da Silva',
+      email: 'maria@example.com',
+      documento: '12345678900',
+    });
+  });
+
+  it('should render view mode as readonly and hide save button', () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.componentRef.setInput('modo', 'view');
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    const saveButton = host.querySelector<HTMLButtonElement>('.save-button');
+    const nome = host.querySelector<HTMLInputElement>('#nome');
+
+    expect(saveButton).toBeNull();
+    expect(nome?.disabled).toBe(true);
+  });
 });

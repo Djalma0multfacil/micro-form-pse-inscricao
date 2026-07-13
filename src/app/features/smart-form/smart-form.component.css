@@ -1,0 +1,52 @@
+:host {
+  display: block;
+}
+
+.smart-form-shell {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.smart-form-header {
+  margin-bottom: 0.875rem;
+}
+
+.smart-form-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.15rem;
+}
+
+.smart-form-header p {
+  margin: 0.35rem 0 0;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.errors {
+  margin-top: 0.75rem;
+  min-height: 1.4rem;
+}
+
+.errors p {
+  margin: 0.2rem 0;
+  color: #b91c1c;
+  font-size: 0.85rem;
+}
+
+.save-button {
+  margin-top: 0.75rem;
+  border: 0;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-button:hover {
+  background: #1d4ed8;
+}
