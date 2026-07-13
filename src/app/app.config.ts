@@ -1,12 +1,30 @@
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
-
-import { routes } from './app.routes';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { CEP_GATEWAY } from './core/ports/cep-gateway.port';
+import { INSCRICAO_GATEWAY } from './core/ports/inscricao-gateway.port';
+import { authTokenInterceptor } from './infrastructure/http/auth-token.interceptor';
+import { InscricaoApiHttpAdapter } from './infrastructure/http/inscricao-api-http.adapter';
+import {
+  RUNTIME_CONFIG_INITIAL,
+  runtimeConfigFactory,
+} from './infrastructure/runtime/runtime-config.token';
+import { ViaCepHttpAdapter } from './infrastructure/http/via-cep-http.adapter';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes), provideClientHydration(withEventReplay())
-  ]
+    provideHttpClient(withFetch(), withInterceptors([authTokenInterceptor])),
+    {
+      provide: RUNTIME_CONFIG_INITIAL,
+      useFactory: runtimeConfigFactory,
+    },
+    {
+      provide: INSCRICAO_GATEWAY,
+      useExisting: InscricaoApiHttpAdapter,
+    },
+    {
+      provide: CEP_GATEWAY,
+      useExisting: ViaCepHttpAdapter,
+    },
+  ],
 };
