@@ -1,34 +1,322 @@
-<div class="form-grid" [formGroup]="parentForm()">
-  <label class="field" for="nome">
-    <span>Nome *</span>
-    <input
-      id="nome"
-      type="text"
-      formControlName="nome"
-      placeholder="Digite seu nome"
-      [readonly]="readonlyMode()"
-    />
-  </label>
+<form class="form-shell" [formGroup]="parentForm()" novalidate>
+  <header class="page-header">
+    <div class="title-wrap">
+      <span class="title-icon"><mat-icon>person</mat-icon></span>
+      <div>
+        <h1>Processo Seletivo</h1>
+        <p>Preencha todos os seus dados para concluir a inscricao</p>
+      </div>
+    </div>
+    <p class="required-badge">
+      <mat-icon>info</mat-icon>
+      Todos os campos com * sao obrigatorios.
+    </p>
+  </header>
 
-  <label class="field" for="email">
-    <span>Email *</span>
-    <input
-      id="email"
-      type="email"
-      formControlName="email"
-      placeholder="Digite seu email"
-      [readonly]="readonlyMode()"
-    />
-  </label>
+  <section class="section-card">
+    <h2><mat-icon>badge</mat-icon>Dados Pessoais</h2>
+    <div class="grid cols-2">
+      <mat-form-field appearance="outline">
+        <mat-label>CPF *</mat-label>
+        <mat-icon matPrefix>person</mat-icon>
+        <input matInput id="cpf" formControlName="cpf" placeholder="Digite seu CPF" [readonly]="readonlyMode()" />
+        @if (hasError('cpf')) {
+          <mat-error>Informe 11 digitos.</mat-error>
+        }
+      </mat-form-field>
 
-  <label class="field field-full" for="documento">
-    <span>Documento *</span>
-    <input
-      id="documento"
-      type="text"
-      formControlName="documento"
-      placeholder="Digite seu documento"
-      [readonly]="readonlyMode()"
-    />
-  </label>
-</div>
+      <mat-form-field appearance="outline">
+        <mat-label>Data de nascimento *</mat-label>
+        <mat-icon matPrefix>calendar_month</mat-icon>
+        <input matInput id="data-nascimento" formControlName="dataNascimento" placeholder="dd/mm/aaaa" [readonly]="readonlyMode()" />
+        @if (hasError('dataNascimento')) {
+          <mat-error>Campo obrigatorio.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="grid cols-1">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome Completo *</mat-label>
+        <mat-icon matPrefix>person_outline</mat-icon>
+        <input matInput id="nome" formControlName="nome" placeholder="Digite seu nome completo" [readonly]="readonlyMode()" />
+        @if (hasError('nome')) {
+          <mat-error>Campo obrigatorio.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="grid cols-2">
+      <mat-form-field appearance="outline">
+        <mat-label>Telefone</mat-label>
+        <mat-icon matPrefix>phone</mat-icon>
+        <input matInput formControlName="telefone" placeholder="(11) 99999-9999" [readonly]="readonlyMode()" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email *</mat-label>
+        <mat-icon matPrefix>mail</mat-icon>
+        <input matInput type="email" id="email" formControlName="email" placeholder="Digite seu e-mail" [readonly]="readonlyMode()" />
+        @if (hasError('email')) {
+          <mat-error>Email invalido.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="grid cols-3">
+      <mat-form-field appearance="outline">
+        <mat-label>Estado Civil *</mat-label>
+        <mat-icon matPrefix>favorite</mat-icon>
+        <mat-select formControlName="estadoCivil">
+          @for (estadoCivil of estadosCivis; track estadoCivil) {
+            <mat-option [value]="estadoCivil">{{ estadoCivil }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nacionalidade *</mat-label>
+        <mat-icon matPrefix>public</mat-icon>
+        <input matInput formControlName="nacionalidade" [readonly]="readonlyMode()" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Pais de origem *</mat-label>
+        <mat-icon matPrefix>language</mat-icon>
+        <input matInput formControlName="paisOrigem" [readonly]="readonlyMode()" />
+      </mat-form-field>
+    </div>
+
+    <div class="grid cols-1">
+      <mat-form-field appearance="outline">
+        <mat-label>Campo de atuacao *</mat-label>
+        <mat-icon matPrefix>work</mat-icon>
+        <input matInput formControlName="campoAtuacao" placeholder="Selecione ou digite sua area de atuacao" [readonly]="readonlyMode()" />
+        @if (hasError('campoAtuacao')) {
+          <mat-error>Campo obrigatorio.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </section>
+
+  <mat-divider></mat-divider>
+
+  <section class="section-card">
+    <h2><mat-icon>location_on</mat-icon>Endereco</h2>
+    <div class="grid cols-3 align-end">
+      <div class="cep-group">
+        <mat-form-field appearance="outline">
+          <mat-label>CEP *</mat-label>
+          <mat-icon matPrefix>markunread_mailbox</mat-icon>
+          <input matInput formControlName="cep" placeholder="Digite o CEP" [readonly]="readonlyMode()" />
+          @if (hasError('cep')) {
+            <mat-error>Informe 8 digitos.</mat-error>
+          }
+        </mat-form-field>
+        <button type="button" mat-stroked-button color="primary" (click)="buscarCepClicked.emit()" [disabled]="readonlyMode() || isLoadingCep()">
+          <mat-icon>search</mat-icon>
+          {{ isLoadingCep() ? 'Buscando...' : 'Buscar endereco' }}
+        </button>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Rua *</mat-label>
+        <mat-icon matPrefix>home</mat-icon>
+        <input matInput formControlName="endereco" placeholder="Digite o nome da rua" [readonly]="readonlyMode()" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Numero *</mat-label>
+        <mat-icon matPrefix>tag</mat-icon>
+        <input matInput formControlName="numero" placeholder="Digite o numero" [readonly]="readonlyMode()" />
+      </mat-form-field>
+    </div>
+
+    <div class="grid cols-4">
+      <mat-form-field appearance="outline">
+        <mat-label>Bairro *</mat-label>
+        <mat-icon matPrefix>map</mat-icon>
+        <input matInput formControlName="bairro" placeholder="Digite o nome do bairro" [readonly]="readonlyMode()" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Cidade *</mat-label>
+        <mat-icon matPrefix>location_city</mat-icon>
+        <input matInput formControlName="cidade" placeholder="Digite o nome da cidade" [readonly]="readonlyMode()" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>UF *</mat-label>
+        <mat-select formControlName="uf">
+          @for (uf of ufs; track uf) {
+            <mat-option [value]="uf">{{ uf }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Complemento</mat-label>
+        <mat-icon matPrefix>pin_drop</mat-icon>
+        <input matInput formControlName="complemento" placeholder="Opcional" [readonly]="readonlyMode()" />
+      </mat-form-field>
+    </div>
+  </section>
+
+  <mat-divider></mat-divider>
+
+  <section class="section-card">
+    <h2><mat-icon>info</mat-icon>Informacoes Adicionais</h2>
+    <div class="grid cols-2">
+      <div class="radio-card">
+        <p>Vaga Afrodescendente</p>
+        <mat-radio-group formControlName="vagaAfrodescendente">
+          <mat-radio-button [value]="false">Nao</mat-radio-button>
+          <mat-radio-button [value]="true">Sim</mat-radio-button>
+        </mat-radio-group>
+      </div>
+
+      <div class="radio-card">
+        <p>
+          Vaga PCD
+          <mat-icon matTooltip="Candidatos PCD devem anexar laudo medico com CID e emissao de ate 180 dias.">help</mat-icon>
+        </p>
+        <mat-radio-group formControlName="vagaPcd">
+          <mat-radio-button [value]="false">Nao</mat-radio-button>
+          <mat-radio-button [value]="true">Sim</mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </div>
+
+    @if (parentForm().controls.vagaPcd.value) {
+      <mat-form-field appearance="outline">
+        <mat-label>Descricao da condicao PCD</mat-label>
+        <textarea matInput rows="2" formControlName="descricaoPcd" placeholder="Informe detalhes da condicao"></textarea>
+      </mat-form-field>
+    }
+
+    <p class="alert-message">
+      Todos os candidatos que optem por concorrer na condicao de Pessoa com Deficiencia (PCD) devem enviar laudo medico com CID e data de emissao nao superior a 180 dias.
+    </p>
+  </section>
+
+  <mat-divider></mat-divider>
+
+  <section class="section-card">
+    <h2><mat-icon>school</mat-icon>Formacao</h2>
+    <div class="grid cols-2">
+      <mat-form-field appearance="outline">
+        <mat-label>Escolaridade *</mat-label>
+        <mat-select formControlName="escolaridade">
+          @for (escolaridade of escolaridades; track escolaridade) {
+            <mat-option [value]="escolaridade">{{ escolaridade }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Curso / Area de Formacao *</mat-label>
+        <input matInput formControlName="cursoFormacao" placeholder="Ex.: Pedagogia" [readonly]="readonlyMode()" />
+      </mat-form-field>
+    </div>
+
+    <div class="grid cols-2">
+      <mat-form-field appearance="outline">
+        <mat-label>Instituicao de Ensino</mat-label>
+        <input matInput formControlName="instituicaoEnsino" placeholder="Nome da instituicao" [readonly]="readonlyMode()" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Ano de Conclusao</mat-label>
+        <input matInput formControlName="anoConclusao" placeholder="AAAA" [readonly]="readonlyMode()" />
+      </mat-form-field>
+    </div>
+  </section>
+
+  <mat-divider></mat-divider>
+
+  <section class="section-card">
+    <h2><mat-icon>business_center</mat-icon>Experiencia</h2>
+    <div class="radio-card">
+      <p>Possui experiencia na area?</p>
+      <mat-radio-group formControlName="possuiExperiencia">
+        <mat-radio-button [value]="false">Nao</mat-radio-button>
+        <mat-radio-button [value]="true">Sim</mat-radio-button>
+      </mat-radio-group>
+    </div>
+
+    @if (parentForm().controls.possuiExperiencia.value) {
+      <div class="grid cols-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Cargo / Funcao *</mat-label>
+          <input matInput formControlName="experienciaCargo" placeholder="Cargo ou funcao" [readonly]="readonlyMode()" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Empresa / Instituicao *</mat-label>
+          <input matInput formControlName="experienciaEmpresa" placeholder="Empresa ou instituicao" [readonly]="readonlyMode()" />
+        </mat-form-field>
+      </div>
+
+      <div class="grid cols-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Periodo de inicio *</mat-label>
+          <input matInput formControlName="experienciaInicio" placeholder="mm/aaaa" [readonly]="readonlyMode()" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Periodo de termino</mat-label>
+          <input matInput formControlName="experienciaFim" placeholder="mm/aaaa ou atual" [readonly]="readonlyMode()" />
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Descricao das atividades</mat-label>
+        <textarea matInput rows="3" formControlName="experienciaDescricao" placeholder="Descreva as atividades" [readonly]="readonlyMode()"></textarea>
+      </mat-form-field>
+    }
+  </section>
+
+  <mat-divider></mat-divider>
+
+  <section class="section-card">
+    <h2><mat-icon>description</mat-icon>Documentos</h2>
+    <p class="docs-help">Anexe arquivos PDF, JPG ou PNG com tamanho maximo de 5 MB por arquivo.</p>
+
+    <div class="upload-grid">
+      <label class="upload-item">
+        <span>RG ou CNH (frente) *</span>
+        <input type="file" (change)="onFileSelected('documentoRgCnh', $event)" [disabled]="readonlyMode()" />
+        <small>{{ fileName('documentoRgCnh') }}</small>
+      </label>
+
+      <label class="upload-item">
+        <span>Comprovante de residencia *</span>
+        <input type="file" (change)="onFileSelected('comprovanteResidencia', $event)" [disabled]="readonlyMode()" />
+        <small>{{ fileName('comprovanteResidencia') }}</small>
+      </label>
+
+      <label class="upload-item">
+        <span>Comprovante de escolaridade *</span>
+        <input type="file" (change)="onFileSelected('comprovanteEscolaridade', $event)" [disabled]="readonlyMode()" />
+        <small>{{ fileName('comprovanteEscolaridade') }}</small>
+      </label>
+
+      @if (parentForm().controls.vagaPcd.value) {
+        <label class="upload-item">
+          <span>Laudo medico (PCD) *</span>
+          <input type="file" (change)="onFileSelected('laudoMedicoPcd', $event)" [disabled]="readonlyMode()" />
+          <small>{{ fileName('laudoMedicoPcd') }}</small>
+        </label>
+      }
+    </div>
+  </section>
+
+  @if (modo() !== 'view') {
+    <footer class="actions">
+      <button type="button" mat-stroked-button (click)="clearClicked.emit()" [disabled]="isSubmitting()">Limpar formulario</button>
+      <button type="button" mat-flat-button color="primary" (click)="submitClicked.emit()" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Enviando...' : 'Enviar inscricao' }}
+      </button>
+    </footer>
+  }
+</form>

@@ -1,47 +1,10 @@
 <section class="shell" aria-label="Micro Formulario de Inscricao">
-  <header class="header">
-    <h1>Micro Formulario de Inscricao</h1>
-    <p>Fluxo Smart/Dumb com formulario reativo standalone.</p>
-  </header>
-
-  <app-smart-form [modo]="modo()" (actionSubmit)="onActionSubmit($event)" />
-
-  <div class="grid">
-    <article class="card">
-      <h2>Runtime</h2>
-      <p><strong>modo:</strong> {{ modo() }}</p>
-      <p><strong>apiBaseUrl:</strong> {{ runtimeConfig().apiBaseUrl }}</p>
-      <p><strong>processoId:</strong> {{ runtimeConfig().processoId ?? 'nao informado' }}</p>
-      <p><strong>inscricaoUuid:</strong> {{ inscricaoUuid() ?? 'nao informado' }}</p>
-    </article>
-
-    <article class="card">
-      <h2>Validacao ViaCEP</h2>
-      <div class="form-row">
-        <label for="cep">CEP</label>
-        <input
-          id="cep"
-          type="text"
-          inputmode="numeric"
-          placeholder="Digite um CEP"
-          [value]="cep()"
-          (input)="atualizarCep($any($event.target).value)"
-        />
-      </div>
-      <button type="button" [disabled]="carregandoCep()" (click)="buscarCep()">
-        {{ carregandoCep() ? 'Buscando...' : 'Buscar endereco' }}
-      </button>
-
-      @if (endereco(); as enderecoAtual) {
-        <div class="feedback success">
-          <strong>Endereco:</strong>
-          <span>{{ enderecoAtual.logradouro }}, {{ enderecoAtual.bairro }} - {{ enderecoAtual.localidade }}/{{ enderecoAtual.uf }}</span>
-        </div>
-      }
-
-      @if (erroCep()) {
-        <div class="feedback error">{{ erroCep() }}</div>
-      }
-    </article>
-  </div>
+  <app-smart-form
+    [modo]="modo()"
+    [apiUrl]="apiUrl()"
+    [authToken]="authToken()"
+    [processoId]="parsedProcessoId()"
+    [inscricaoUuid]="inscricaoUuid()"
+    (actionSubmit)="onActionSubmit($event)"
+  />
 </section>

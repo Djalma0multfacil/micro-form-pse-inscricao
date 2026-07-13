@@ -1,34 +1,24 @@
 <section class="smart-form-shell">
-  <header class="smart-form-header">
-    <h2>Cadastro</h2>
-    <p>Modo atual: {{ modo() }}</p>
-  </header>
-
-  @switch (modo()) {
-    @case ('create') {
-      <app-form-edit [parentForm]="form" />
-    }
-    @case ('edit') {
-      <app-form-edit [parentForm]="form" />
-    }
-    @default {
-      <app-form-edit [parentForm]="form" [readonlyMode]="true" />
-    }
+  @if (isLoadingInscricao()) {
+    <p class="loading-message">Carregando inscricao...</p>
   }
 
-  <div class="errors" aria-live="polite">
-    @if (hasError('nome')) {
-      <p>Nome: {{ errorMessage('nome') }}</p>
-    }
-    @if (hasError('email')) {
-      <p>Email: {{ errorMessage('email') }}</p>
-    }
-    @if (hasError('documento')) {
-      <p>Documento: {{ errorMessage('documento') }}</p>
-    }
-  </div>
-
-  @if (modo() !== 'view') {
-    <button type="button" class="save-button" (click)="submit()">Salvar</button>
+  @if (submitError()) {
+    <div class="error-banner" role="alert">{{ submitError() }}</div>
   }
+
+  @if (cepError()) {
+    <div class="warning-banner" role="status">{{ cepError() }}</div>
+  }
+
+  <app-form-edit
+    [parentForm]="form"
+    [modo]="modo()"
+    [readonlyMode]="modo() === 'view'"
+    [isSubmitting]="isSubmitting()"
+    [isLoadingCep]="isLoadingCep()"
+    (submitClicked)="submit()"
+    (clearClicked)="clearForm()"
+    (buscarCepClicked)="buscarEnderecoPorCep()"
+  />
 </section>
