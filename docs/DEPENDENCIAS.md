@@ -51,7 +51,7 @@ Instalação via npm:
 npm install @angular/elements
 ```
 
-Após a instalação, a dependência fica registrada em `dependencies` do `package.json` e pode ser usada com `createCustomElement` para registrar tags customizadas como `micro-formulario-inscricao`.
+Após a instalação, a dependência fica registrada em `dependencies` do `package.json` e pode ser usada com `createCustomElement` para registrar tags customizadas como `micro-formulario-ps-inscricao`.
 
 ---
 
