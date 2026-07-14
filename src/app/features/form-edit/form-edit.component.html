@@ -78,7 +78,7 @@
           [readonly]="readonlyMode()"
           (input)="onTelefoneInput($event)"
         />
-        @if (hasError('telefone', 'pattern')) {
+        @if (hasError('telefone', 'telefoneInvalido')) {
           <mat-error>Informe telefone valido com 10 ou 11 digitos.</mat-error>
         }
       </mat-form-field>

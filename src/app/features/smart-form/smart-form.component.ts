@@ -32,6 +32,7 @@ import {
   sanitizePhone,
 } from '../../shared/models/personal-data-format.util';
 import { cpfValidator } from '../../shared/validators/cpf.validator';
+import { telefoneValidator } from '../../shared/validators/telefone.validator';
 import { FormEditComponent, FormEditFormGroup } from '../form-edit/form-edit.component';
 
 export type FormMode = 'create' | 'edit' | 'view';
@@ -51,8 +52,6 @@ export type SmartFormSubmitEvent = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SmartFormComponent {
-  private static readonly TELEFONE_PATTERN = /^$|^\(\d{2}\)\s(?:\d{4}-\d{4}|\d{5}-\d{4})$/;
-
   readonly modo = input<FormMode>('create');
   readonly apiUrl = input<string | undefined>(undefined);
   readonly authToken = input<string | undefined>(undefined);
@@ -79,7 +78,7 @@ export class SmartFormComponent {
       cpf: this.formBuilder.control('', [Validators.required, cpfValidator]),
       dataNascimento: this.formBuilder.control('', [Validators.required]),
       nome: this.formBuilder.control('', [Validators.required, Validators.minLength(3)]),
-      telefone: this.formBuilder.control('', [Validators.pattern(SmartFormComponent.TELEFONE_PATTERN)]),
+      telefone: this.formBuilder.control('', [telefoneValidator]),
       email: this.formBuilder.control('', [Validators.required, Validators.email]),
       estadoCivil: this.formBuilder.control('', [Validators.required]),
       nacionalidade: this.formBuilder.control('Brasileira', [Validators.required]),
