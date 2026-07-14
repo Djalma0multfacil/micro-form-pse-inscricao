@@ -1,39 +1,17 @@
 const CPF_PREFIX_DIGITS = 9;
-const CPF_SUFFIX_CHARS = 2;
+const CPF_SUFFIX_DIGITS = 2;
+const CPF_TOTAL_DIGITS = CPF_PREFIX_DIGITS + CPF_SUFFIX_DIGITS;
 const PHONE_MAX_DIGITS = 11;
 const DATE_SEGMENT_COUNT = 3;
 
 export function sanitizeCpf(value: string): string {
-  const normalized = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-
-  let prefixDigits = '';
-  let suffix = '';
-
-  for (const character of normalized) {
-    if (prefixDigits.length < CPF_PREFIX_DIGITS) {
-      if (/\d/.test(character)) {
-        prefixDigits += character;
-      }
-
-      continue;
-    }
-
-    if (suffix.length >= CPF_SUFFIX_CHARS) {
-      break;
-    }
-
-    if (/[A-Z0-9]/.test(character)) {
-      suffix += character;
-    }
-  }
-
-  return `${prefixDigits}${suffix}`;
+  return value.replace(/\D/g, '').slice(0, CPF_TOTAL_DIGITS);
 }
 
 export function formatCpfForDisplay(value: string): string {
   const sanitized = sanitizeCpf(value);
   const prefix = sanitized.slice(0, CPF_PREFIX_DIGITS);
-  const suffix = sanitized.slice(CPF_PREFIX_DIGITS, CPF_PREFIX_DIGITS + CPF_SUFFIX_CHARS);
+  const suffix = sanitized.slice(CPF_PREFIX_DIGITS, CPF_PREFIX_DIGITS + CPF_SUFFIX_DIGITS);
 
   const firstPart = prefix.slice(0, 3);
   const secondPart = prefix.slice(3, 6);

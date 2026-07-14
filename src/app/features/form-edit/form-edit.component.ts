@@ -118,10 +118,6 @@ export class FormEditComponent {
     'SE',
     'TO',
   ];
-  readonly cpfMaskPatterns = {
-    D: { pattern: /[0-9]/ },
-    A: { pattern: /[A-Za-z0-9]/ },
-  };
 
   onTelefoneInput(event: Event): void {
     const inputElement = event.target as HTMLInputElement | null;

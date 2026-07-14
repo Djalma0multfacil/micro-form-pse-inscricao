@@ -25,8 +25,7 @@
           formControlName="cpf"
           placeholder="123.456.789-AB"
           autocomplete="off"
-          mask="DDD.DDD.DDD-AA"
-          [patterns]="cpfMaskPatterns"
+          mask="000.000.000-AA"
           [dropSpecialCharacters]="false"
           [readonly]="readonlyMode()"
         />
@@ -34,7 +33,7 @@
           <mat-error>Campo obrigatorio.</mat-error>
         }
         @if (hasError('cpf', 'cpfInvalido')) {
-          <mat-error>Informe no formato 123.456.789-AB.</mat-error>
+          <mat-error>Informe um CPF valido.</mat-error>
         }
       </mat-form-field>
 

@@ -10,11 +10,9 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
-  AbstractControl,
   FormControl,
   NonNullableFormBuilder,
   ReactiveFormsModule,
-  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, EMPTY, map, switchMap, tap, catchError } from 'rxjs';
@@ -33,6 +31,7 @@ import {
   sanitizeCpf,
   sanitizePhone,
 } from '../../shared/models/personal-data-format.util';
+import { cpfValidator } from '../../shared/validators/cpf.validator';
 import { FormEditComponent, FormEditFormGroup } from '../form-edit/form-edit.component';
 
 export type FormMode = 'create' | 'edit' | 'view';
@@ -52,7 +51,6 @@ export type SmartFormSubmitEvent = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SmartFormComponent {
-  private static readonly CPF_PATTERN = /^\d{3}\.\d{3}\.\d{3}-[A-Za-z0-9]{2}$/;
   private static readonly TELEFONE_PATTERN = /^$|^\(\d{2}\)\s(?:\d{4}-\d{4}|\d{5}-\d{4})$/;
 
   readonly modo = input<FormMode>('create');
@@ -78,7 +76,7 @@ export class SmartFormComponent {
 
   constructor() {
     this.form = this.formBuilder.group({
-      cpf: this.formBuilder.control('', [Validators.required, SmartFormComponent.cpfEstritoValidator]),
+      cpf: this.formBuilder.control('', [Validators.required, cpfValidator]),
       dataNascimento: this.formBuilder.control('', [Validators.required]),
       nome: this.formBuilder.control('', [Validators.required, Validators.minLength(3)]),
       telefone: this.formBuilder.control('', [Validators.pattern(SmartFormComponent.TELEFONE_PATTERN)]),
@@ -161,15 +159,6 @@ export class SmartFormComponent {
         this.resetCreateDefaults();
       }
     });
-  }
-
-  private static cpfEstritoValidator(control: AbstractControl<string>): ValidationErrors | null {
-    const value = control.value?.trim();
-    if (!value) {
-      return null;
-    }
-
-    return SmartFormComponent.CPF_PATTERN.test(value) ? null : { cpfInvalido: true };
   }
 
   submit(): void {

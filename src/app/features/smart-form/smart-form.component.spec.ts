@@ -18,7 +18,7 @@ describe('SmartFormComponent', () => {
       return of({
         uuid: 'new-uuid',
         nome: 'Maria da Silva',
-        cpf: '123456789AB',
+        cpf: '52998224725',
         email: 'maria@teste.com',
       });
     },
@@ -29,7 +29,7 @@ describe('SmartFormComponent', () => {
       of({
         uuid: 'edit-uuid',
         nome: 'Maria Atualizada',
-        cpf: '123456789AB',
+        cpf: '52998224725',
         email: 'maria@teste.com',
       }),
   };
@@ -39,7 +39,7 @@ describe('SmartFormComponent', () => {
       of({
         uuid: 'edit-uuid',
         nome: 'Maria',
-        cpf: '123456789AB',
+        cpf: '52998224725',
         telefone: '11912345678',
         dataNascimento: '1990-01-01',
         email: 'maria@teste.com',
@@ -129,7 +129,7 @@ describe('SmartFormComponent', () => {
     });
 
     component.form.patchValue({
-      cpf: '123.456.789-AB',
+      cpf: '529.982.247-25',
       dataNascimento: '1990-01-01',
       nome: 'Joao',
       telefone: '(11) 91234-5678',
@@ -163,7 +163,7 @@ describe('SmartFormComponent', () => {
 
     expect(criarPayloadRecebido).toEqual(
       expect.objectContaining({
-        cpf: '123456789AB',
+        cpf: '52998224725',
         telefone: '11912345678',
         dataNascimento: '1990-01-01',
       }),
@@ -186,7 +186,7 @@ describe('SmartFormComponent', () => {
 
     const component = fixture.componentInstance;
 
-    expect(component.form.controls.cpf.value).toBe('123.456.789-AB');
+    expect(component.form.controls.cpf.value).toBe('529.982.247-25');
     expect(component.form.controls.telefone.value).toBe('(11) 91234-5678');
     expect(component.form.controls.dataNascimento.value).toBe('1990-01-01');
   });
@@ -198,7 +198,7 @@ describe('SmartFormComponent', () => {
     const component = fixture.componentInstance;
 
     component.form.patchValue({
-      cpf: '123.456.789-A',
+      cpf: '123.456.789-12',
       dataNascimento: '1990-01-01',
       nome: 'Joao',
       email: 'joao@email.com',
@@ -224,13 +224,13 @@ describe('SmartFormComponent', () => {
     expect(component.form.controls.cpf.hasError('cpfInvalido')).toBe(true);
   });
 
-  it('should keep cpf invalid when suffix has non-alphanumeric chars', () => {
+  it('should keep cpf invalid when digits are repeated', () => {
     const fixture = TestBed.createComponent(SmartFormComponent);
     fixture.detectChanges();
 
     const component = fixture.componentInstance;
 
-    component.form.controls.cpf.setValue('123.456.789-@#');
+    component.form.controls.cpf.setValue('111.111.111-11');
 
     expect(component.form.controls.cpf.hasError('cpfInvalido')).toBe(true);
   });
