@@ -6,7 +6,7 @@
 
 1. **Gestão de Inscrições:** O portal é responsável por listar as inscrições consumindo a rota `GET /api/v2/processo-seletivo/inscricoes`. Implemente a listagem com suporte a paginação e filtros via query string (`spatie/laravel-query-builder`) para campos como `uuid`, `status`, `nome`, e `cpf`.
     
-2. **Consumo do Web Component:** Para visualizar ou editar os dados cadastrais do candidato, o portal NÃO deve implementar o formulário. Ele deve instanciar o Web Component customizado `<micro-formulario-inscricao>`.
+2. **Consumo do Web Component:** Para visualizar ou editar os dados cadastrais do candidato, o portal NÃO deve implementar o formulário. Ele deve instanciar o Web Component customizado `<micro-formulario-ps-inscricao>`.
     
 3. **Integração com o Micro-frontend:** O componente Angular host deve injetar na tag do Web Component os atributos: `modo="edit"` (ou `"view"`), `auth-token="[TOKEN_DO_RH]"` e `inscricao-uuid="[UUID_DA_INSCRICAO]"`. Adicione o `CUSTOM_ELEMENTS_SCHEMA` no módulo para o Angular compilar sem erros.
     

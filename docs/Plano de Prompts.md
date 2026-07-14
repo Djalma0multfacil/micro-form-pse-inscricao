@@ -35,7 +35,7 @@ Esta é a parte crucial onde encapsulamos o Angular dentro de uma tag HTML gené
 
 > "Modifique o arquivo `main.ts` (ou o arquivo de bootstrap da aplicação Angular) para usar o `@angular/elements`.
 > 
-> Escreva o código para pegar o `SmartFormComponent`, passá-lo na função `createCustomElement` injetando o `EnvironmentInjector`, e então registrá-lo no DOM usando `customElements.define` com a tag `<micro-formulario-educacao>`. Lembre-se de remover o bootstrap padrão do `AppComponent`, pois este projeto servirá apenas para expor o web component."
+> Escreva o código para pegar o `SmartFormComponent`, passá-lo na função `createCustomElement` injetando o `EnvironmentInjector`, e então registrá-lo no DOM usando `customElements.define` com a tag `<micro-formulario-ps-inscricao>`. Lembre-se de remover o bootstrap padrão do `AppComponent`, pois este projeto servirá apenas para expor o web component."
 
 ### Fase 4: Build e Empacotamento
 
@@ -51,7 +51,7 @@ Após gerar e hospedar o seu arquivo `micro-form-bundle.js`, você precisará in
 
 **Prompt 6 (Integração com o Hospedeiro):**
 
-> "Tenho um Web Component customizado com a tag `<micro-formulario-educacao modo="create"></micro-formulario-educacao>`.
+> "Tenho um Web Component customizado com a tag `<micro-formulario-ps-inscricao modo="create"></micro-formulario-ps-inscricao>`.
 > 
 > 1. Mostre como adicionar o `CUSTOM_ELEMENTS_SCHEMA` no meu componente Angular Standalone (ou NgModule) para que o Angular não lance erro sobre essa tag desconhecida.
 >     
