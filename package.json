@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:bundle": "node tools/build-bundle.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:micro-form-pse-inscricao": "node dist/micro-form-pse-inscricao/server/server.mjs"

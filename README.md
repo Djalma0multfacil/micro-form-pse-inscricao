@@ -36,6 +36,59 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
+## Building the Web Component Bundle
+
+This project is published as a custom element (`<micro-formulario-ps-inscricao>`) consumed by host Angular portals. To generate a single distributable JS file, run:
+
+```bash
+npm run build:bundle
+```
+
+The command executes `ng build --configuration=production` and then concatenates all browser JS chunks (in the exact load order declared in `index.html`) into:
+
+```
+dist/micro-form-bundle.js
+```
+
+> **Note:** Angular 21 outputs JS files with content-hash names (e.g. `main-HLENQT3V.js`, `chunk-IXP6G6YN.js`). The script reads `dist/micro-form-pse-inscricao/browser/index.html` as the source of truth for chunk order — no hardcoded filenames are needed.
+
+### Deployment artefacts
+
+After the build, distribute the following files together:
+
+| File | Description |
+|---|---|
+| `dist/micro-form-bundle.js` | Single JS bundle — register and execute the custom element |
+| `dist/micro-form-pse-inscricao/browser/styles-*.css` | Global styles (Material theme + application styles) |
+
+### Host portal integration example
+
+```html
+<!-- 1. Load the bundle and styles -->
+<link rel="stylesheet" href="styles-B5QEH473.css" />
+<script src="micro-form-bundle.js"></script>
+
+<!-- 2. Use the custom element -->
+<micro-formulario-ps-inscricao
+  modo="create"
+  api-url="https://api.example.com/api/v2"
+  auth-token="<JWT>"
+  processo-id="1"
+></micro-formulario-ps-inscricao>
+```
+
+For Angular host portals, add `CUSTOM_ELEMENTS_SCHEMA` to the component's schemas array to suppress unknown-element warnings:
+
+```typescript
+import { CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core';
+
+@Component({
+  // ...
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
+export class HostComponent {}
+```
+
 ## Running unit tests
 
 To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
