@@ -35,7 +35,7 @@ describe('App', () => {
               of({
                 uuid: 'new-uuid',
                 nome: 'Maria',
-                cpf: '12345678901',
+                cpf: '123456789AB',
                 email: 'maria@example.com',
               }),
           },
@@ -47,7 +47,7 @@ describe('App', () => {
               of({
                 uuid: 'edit-uuid',
                 nome: 'Maria',
-                cpf: '12345678901',
+                cpf: '123456789AB',
                 email: 'maria@example.com',
               }),
           },
@@ -59,7 +59,7 @@ describe('App', () => {
               of({
                 uuid: 'edit-uuid',
                 nome: 'Maria',
-                cpf: '12345678901',
+                cpf: '123456789AB',
                 email: 'maria@example.com',
               }),
           },
@@ -109,7 +109,7 @@ describe('App', () => {
     const smartForm = smartFormDebugElement.componentInstance as SmartFormComponent;
 
     smartForm.form.patchValue({
-      cpf: '12345678901',
+      cpf: '123.456.789-AB',
       dataNascimento: '1990-01-01',
       nome: 'Maria da Silva',
       email: 'maria@example.com',

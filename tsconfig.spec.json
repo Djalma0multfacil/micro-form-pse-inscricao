@@ -6,9 +6,13 @@
     "rootDir": "./src",
     "outDir": "./out-tsc/spec",
     "types": [
-      "vitest/globals"
+      "vitest/globals",
+      "node"
     ]
   },
+  "files": [
+    "src/test-setup.ts"
+  ],
   "include": [
     "src/**/*.d.ts",
     "src/**/*.spec.ts"

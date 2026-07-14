@@ -19,17 +19,36 @@
       <mat-form-field appearance="outline">
         <mat-label>CPF *</mat-label>
         <mat-icon matPrefix>person</mat-icon>
-        <input matInput id="cpf" formControlName="cpf" placeholder="Digite seu CPF" [readonly]="readonlyMode()" />
-        @if (hasError('cpf')) {
-          <mat-error>Informe 11 digitos.</mat-error>
+        <input
+          matInput
+          id="cpf"
+          formControlName="cpf"
+          placeholder="123.456.789-AB"
+          autocomplete="off"
+          mask="DDD.DDD.DDD-AA"
+          [patterns]="cpfMaskPatterns"
+          [dropSpecialCharacters]="false"
+          [readonly]="readonlyMode()"
+        />
+        @if (hasError('cpf', 'required')) {
+          <mat-error>Campo obrigatorio.</mat-error>
+        }
+        @if (hasError('cpf', 'cpfInvalido')) {
+          <mat-error>Informe no formato 123.456.789-AB.</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Data de nascimento *</mat-label>
         <mat-icon matPrefix>calendar_month</mat-icon>
-        <input matInput id="data-nascimento" formControlName="dataNascimento" placeholder="dd/mm/aaaa" [readonly]="readonlyMode()" />
-        @if (hasError('dataNascimento')) {
+        <input
+          matInput
+          type="date"
+          id="data-nascimento"
+          formControlName="dataNascimento"
+          [readonly]="readonlyMode()"
+        />
+        @if (hasError('dataNascimento', 'required')) {
           <mat-error>Campo obrigatorio.</mat-error>
         }
       </mat-form-field>
@@ -50,7 +69,19 @@
       <mat-form-field appearance="outline">
         <mat-label>Telefone</mat-label>
         <mat-icon matPrefix>phone</mat-icon>
-        <input matInput formControlName="telefone" placeholder="(11) 99999-9999" [readonly]="readonlyMode()" />
+        <input
+          matInput
+          type="tel"
+          formControlName="telefone"
+          placeholder="(11) 99999-9999"
+          inputmode="numeric"
+          autocomplete="tel"
+          [readonly]="readonlyMode()"
+          (input)="onTelefoneInput($event)"
+        />
+        @if (hasError('telefone', 'pattern')) {
+          <mat-error>Informe telefone valido com 10 ou 11 digitos.</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -113,10 +144,6 @@
             <mat-error>Informe 8 digitos.</mat-error>
           }
         </mat-form-field>
-        <button type="button" mat-stroked-button color="primary" (click)="buscarCepClicked.emit()" [disabled]="readonlyMode() || isLoadingCep()">
-          <mat-icon>search</mat-icon>
-          {{ isLoadingCep() ? 'Buscando...' : 'Buscar endereco' }}
-        </button>
       </div>
 
       <mat-form-field appearance="outline">

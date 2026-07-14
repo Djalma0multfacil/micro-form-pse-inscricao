@@ -3,15 +3,15 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { formatPhoneForDisplay } from '../../shared/models/personal-data-format.util';
 
 export type FormEditFormGroup = FormGroup<{
   cpf: FormControl<string>;
@@ -56,18 +56,18 @@ export type FormEditFormGroup = FormGroup<{
     ReactiveFormsModule,
     MatAutocompleteModule,
     MatButtonModule,
-    MatDatepickerModule,
     MatDividerModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatNativeDateModule,
     MatRadioModule,
     MatSelectModule,
     MatTooltipModule,
+    NgxMaskDirective,
   ],
   templateUrl: './form-edit.component.html',
   styleUrl: './form-edit.component.css',
+  providers: [provideNgxMask()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormEditComponent {
@@ -75,11 +75,9 @@ export class FormEditComponent {
   readonly parentForm = input.required<FormEditFormGroup>();
   readonly readonlyMode = input<boolean>(false);
   readonly isSubmitting = input<boolean>(false);
-  readonly isLoadingCep = input<boolean>(false);
 
   readonly submitClicked = output<void>();
   readonly clearClicked = output<void>();
-  readonly buscarCepClicked = output<void>();
 
   readonly estadosCivis = ['Solteiro(a)', 'Casado(a)', 'Divorciado(a)', 'Viuvo(a)', 'Uniao estavel'];
   readonly escolaridades = [
@@ -120,6 +118,21 @@ export class FormEditComponent {
     'SE',
     'TO',
   ];
+  readonly cpfMaskPatterns = {
+    D: { pattern: /[0-9]/ },
+    A: { pattern: /[A-Za-z0-9]/ },
+  };
+
+  onTelefoneInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement | null;
+    if (!inputElement) {
+      return;
+    }
+
+    const maskedPhone = formatPhoneForDisplay(inputElement.value);
+    inputElement.value = maskedPhone;
+    this.parentForm().controls.telefone.setValue(maskedPhone);
+  }
 
   onFileSelected(controlName: keyof FormEditFormGroup['controls'], event: Event): void {
     const inputElement = event.target as HTMLInputElement;

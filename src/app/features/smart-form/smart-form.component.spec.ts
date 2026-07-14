@@ -8,14 +8,20 @@ import { RUNTIME_CONFIG_INITIAL, RuntimeConfig } from '../../infrastructure/runt
 import { SmartFormComponent } from './smart-form.component';
 
 describe('SmartFormComponent', () => {
+  let criarPayloadRecebido: unknown;
+  let buscarCepChamadas = 0;
+
   const criarUseCaseMock = {
-    execute: () =>
-      of({
+    execute: (payload: unknown) => {
+      criarPayloadRecebido = payload;
+
+      return of({
         uuid: 'new-uuid',
         nome: 'Maria da Silva',
-        cpf: '12345678901',
+        cpf: '123456789AB',
         email: 'maria@teste.com',
-      }),
+      });
+    },
   };
 
   const atualizarUseCaseMock = {
@@ -23,7 +29,7 @@ describe('SmartFormComponent', () => {
       of({
         uuid: 'edit-uuid',
         nome: 'Maria Atualizada',
-        cpf: '12345678901',
+        cpf: '123456789AB',
         email: 'maria@teste.com',
       }),
   };
@@ -33,21 +39,26 @@ describe('SmartFormComponent', () => {
       of({
         uuid: 'edit-uuid',
         nome: 'Maria',
-        cpf: '12345678901',
+        cpf: '123456789AB',
+        telefone: '11912345678',
+        dataNascimento: '1990-01-01',
         email: 'maria@teste.com',
       }),
   };
 
   const buscarCepUseCaseMock = {
-    execute: () =>
-      of({
+    execute: () => {
+      buscarCepChamadas += 1;
+
+      return of({
         cep: '01001-000',
         logradouro: 'Praca da Se',
         complemento: '',
         bairro: 'Se',
         localidade: 'Sao Paulo',
         uf: 'SP',
-      }),
+      });
+    },
   };
 
   const runtimeConfig: RuntimeConfig = {
@@ -58,6 +69,8 @@ describe('SmartFormComponent', () => {
   };
 
   beforeEach(async () => {
+    buscarCepChamadas = 0;
+
     await TestBed.configureTestingModule({
       imports: [SmartFormComponent],
       providers: [
@@ -116,9 +129,10 @@ describe('SmartFormComponent', () => {
     });
 
     component.form.patchValue({
-      cpf: '12345678901',
+      cpf: '123.456.789-AB',
       dataNascimento: '1990-01-01',
       nome: 'Joao',
+      telefone: '(11) 91234-5678',
       email: 'joao@email.com',
       estadoCivil: 'Solteiro(a)',
       nacionalidade: 'Brasileira',
@@ -146,6 +160,14 @@ describe('SmartFormComponent', () => {
         mode: 'create',
       }),
     );
+
+    expect(criarPayloadRecebido).toEqual(
+      expect.objectContaining({
+        cpf: '123456789AB',
+        telefone: '11912345678',
+        dataNascimento: '1990-01-01',
+      }),
+    );
   });
 
   it('should disable form controls in view mode', () => {
@@ -156,4 +178,88 @@ describe('SmartFormComponent', () => {
     expect(fixture.componentInstance.form.disabled).toBe(true);
   });
 
+  it('should load masked cpf and telefone when editing inscricao', () => {
+    const fixture = TestBed.createComponent(SmartFormComponent);
+    fixture.componentRef.setInput('modo', 'edit');
+    fixture.componentRef.setInput('inscricaoUuid', 'edit-uuid');
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance;
+
+    expect(component.form.controls.cpf.value).toBe('123.456.789-AB');
+    expect(component.form.controls.telefone.value).toBe('(11) 91234-5678');
+    expect(component.form.controls.dataNascimento.value).toBe('1990-01-01');
+  });
+
+  it('should keep form invalid when cpf format is incomplete', () => {
+    const fixture = TestBed.createComponent(SmartFormComponent);
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance;
+
+    component.form.patchValue({
+      cpf: '123.456.789-A',
+      dataNascimento: '1990-01-01',
+      nome: 'Joao',
+      email: 'joao@email.com',
+      estadoCivil: 'Solteiro(a)',
+      nacionalidade: 'Brasileira',
+      paisOrigem: 'Brasil',
+      campoAtuacao: 'Educacao',
+      cep: '01001000',
+      endereco: 'Praca da Se',
+      numero: '100',
+      bairro: 'Se',
+      cidade: 'Sao Paulo',
+      uf: 'SP',
+      escolaridade: 'Graduacao',
+      cursoFormacao: 'Pedagogia',
+    });
+
+    component.form.controls.documentoRgCnh.setValue(new File(['a'], 'rg.pdf'));
+    component.form.controls.comprovanteResidencia.setValue(new File(['a'], 'residencia.pdf'));
+    component.form.controls.comprovanteEscolaridade.setValue(new File(['a'], 'escolaridade.pdf'));
+
+    expect(component.form.invalid).toBe(true);
+    expect(component.form.controls.cpf.hasError('cpfInvalido')).toBe(true);
+  });
+
+  it('should keep cpf invalid when suffix has non-alphanumeric chars', () => {
+    const fixture = TestBed.createComponent(SmartFormComponent);
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance;
+
+    component.form.controls.cpf.setValue('123.456.789-@#');
+
+    expect(component.form.controls.cpf.hasError('cpfInvalido')).toBe(true);
+  });
+
+  it('should fetch and fill endereco automatically when cep has 8 digits', async () => {
+    const fixture = TestBed.createComponent(SmartFormComponent);
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance;
+    component.form.controls.cep.setValue('01001000');
+    await new Promise((resolve) => setTimeout(resolve, 450));
+
+    expect(buscarCepChamadas).toBe(1);
+    expect(component.form.controls.endereco.value).toBe('Praca da Se');
+    expect(component.form.controls.bairro.value).toBe('Se');
+    expect(component.form.controls.cidade.value).toBe('Sao Paulo');
+    expect(component.form.controls.uf.value).toBe('SP');
+  });
+
+  it('should not fetch endereco automatically when cep is incomplete', async () => {
+    const fixture = TestBed.createComponent(SmartFormComponent);
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance;
+    component.form.controls.cep.setValue('01001');
+    await new Promise((resolve) => setTimeout(resolve, 450));
+
+    expect(buscarCepChamadas).toBe(0);
+  });
+
 });
+

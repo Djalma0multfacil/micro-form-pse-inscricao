@@ -10,9 +10,11 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
+  AbstractControl,
   FormControl,
   NonNullableFormBuilder,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, EMPTY, map, switchMap, tap, catchError } from 'rxjs';
@@ -25,6 +27,12 @@ import { BuscarEnderecoPorCepUseCase } from '../../core/use-cases/buscar-enderec
 import { CriarInscricaoUseCase } from '../../core/use-cases/criar-inscricao.use-case';
 import { ObterInscricaoPorUuidUseCase } from '../../core/use-cases/obter-inscricao-por-uuid.use-case';
 import { RuntimeConfigStore } from '../../infrastructure/runtime/runtime-config.store';
+import {
+  formatCpfForDisplay,
+  formatPhoneForDisplay,
+  sanitizeCpf,
+  sanitizePhone,
+} from '../../shared/models/personal-data-format.util';
 import { FormEditComponent, FormEditFormGroup } from '../form-edit/form-edit.component';
 
 export type FormMode = 'create' | 'edit' | 'view';
@@ -44,6 +52,9 @@ export type SmartFormSubmitEvent = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SmartFormComponent {
+  private static readonly CPF_PATTERN = /^\d{3}\.\d{3}\.\d{3}-[A-Za-z0-9]{2}$/;
+  private static readonly TELEFONE_PATTERN = /^$|^\(\d{2}\)\s(?:\d{4}-\d{4}|\d{5}-\d{4})$/;
+
   readonly modo = input<FormMode>('create');
   readonly apiUrl = input<string | undefined>(undefined);
   readonly authToken = input<string | undefined>(undefined);
@@ -54,7 +65,6 @@ export class SmartFormComponent {
   readonly form: FormEditFormGroup;
   readonly isSubmitting = signal(false);
   readonly isLoadingInscricao = signal(false);
-  readonly isLoadingCep = signal(false);
   readonly submitError = signal<string | null>(null);
   readonly cepError = signal<string | null>(null);
 
@@ -68,10 +78,10 @@ export class SmartFormComponent {
 
   constructor() {
     this.form = this.formBuilder.group({
-      cpf: this.formBuilder.control('', [Validators.required, Validators.pattern(/^\d{11}$/)]),
+      cpf: this.formBuilder.control('', [Validators.required, SmartFormComponent.cpfEstritoValidator]),
       dataNascimento: this.formBuilder.control('', [Validators.required]),
       nome: this.formBuilder.control('', [Validators.required, Validators.minLength(3)]),
-      telefone: this.formBuilder.control(''),
+      telefone: this.formBuilder.control('', [Validators.pattern(SmartFormComponent.TELEFONE_PATTERN)]),
       email: this.formBuilder.control('', [Validators.required, Validators.email]),
       estadoCivil: this.formBuilder.control('', [Validators.required]),
       nacionalidade: this.formBuilder.control('Brasileira', [Validators.required]),
@@ -153,6 +163,15 @@ export class SmartFormComponent {
     });
   }
 
+  private static cpfEstritoValidator(control: AbstractControl<string>): ValidationErrors | null {
+    const value = control.value?.trim();
+    if (!value) {
+      return null;
+    }
+
+    return SmartFormComponent.CPF_PATTERN.test(value) ? null : { cpfInvalido: true };
+  }
+
   submit(): void {
     if (this.modo() === 'view') {
       return;
@@ -202,16 +221,6 @@ export class SmartFormComponent {
     this.resetCreateDefaults();
     this.submitError.set(null);
     this.cepError.set(null);
-  }
-
-  buscarEnderecoPorCep(): void {
-    const cepSanitizado = this.form.controls.cep.value.replace(/\D/g, '');
-    if (cepSanitizado.length !== 8) {
-      this.cepError.set('CEP invalido. Informe 8 digitos.');
-      return;
-    }
-
-    this.buscarCep(cepSanitizado);
   }
 
   private watchCepChanges(): void {
@@ -295,36 +304,6 @@ export class SmartFormComponent {
     control.updateValueAndValidity({ emitEvent: false });
   }
 
-  private buscarCep(cep: string): void {
-    this.isLoadingCep.set(true);
-    this.cepError.set(null);
-
-    this.buscarEnderecoPorCepUseCase
-      .execute(cep)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (endereco) => {
-          this.isLoadingCep.set(false);
-          this.form.patchValue(
-            {
-              endereco: endereco.logradouro,
-              bairro: endereco.bairro,
-              cidade: endereco.localidade,
-              uf: endereco.uf,
-              complemento: endereco.complemento || this.form.controls.complemento.value,
-            },
-            { emitEvent: false },
-          );
-        },
-        error: (error) => {
-          this.isLoadingCep.set(false);
-          this.cepError.set(
-            error instanceof Error ? error.message : 'Falha ao consultar endereco por CEP.',
-          );
-        },
-      });
-  }
-
   private loadInscricao(uuid: string): void {
     this.isLoadingInscricao.set(true);
     this.submitError.set(null);
@@ -337,10 +316,10 @@ export class SmartFormComponent {
           this.isLoadingInscricao.set(false);
           this.form.patchValue(
             {
-              cpf: inscricao.cpf ?? '',
-              dataNascimento: inscricao.dataNascimento ?? '',
+              cpf: formatCpfForDisplay(inscricao.cpf ?? ''),
+              dataNascimento: inscricao.dataNascimento?.split('T')[0] ?? '',
               nome: inscricao.nome ?? '',
-              telefone: inscricao.telefone ?? '',
+              telefone: formatPhoneForDisplay(inscricao.telefone ?? ''),
               email: inscricao.email ?? '',
               estadoCivil: inscricao.estadoCivil ?? '',
               nacionalidade: inscricao.nacionalidade ?? 'Brasileira',
@@ -384,14 +363,14 @@ export class SmartFormComponent {
 
     return {
       nome: raw.nome,
-      cpf: raw.cpf,
+      cpf: sanitizeCpf(raw.cpf),
       email: raw.email,
-      dataNascimento: raw.dataNascimento,
+      dataNascimento: raw.dataNascimento || undefined,
       estadoCivil: raw.estadoCivil,
       nacionalidade: raw.nacionalidade,
       paisOrigem: raw.paisOrigem,
       campoAtuacao: raw.campoAtuacao,
-      telefone: raw.telefone,
+      telefone: sanitizePhone(raw.telefone),
       cep: raw.cep,
       endereco: raw.endereco,
       numero: raw.numero,
