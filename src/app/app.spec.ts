@@ -109,7 +109,7 @@ describe('App', () => {
     const smartForm = smartFormDebugElement.componentInstance as SmartFormComponent;
 
     smartForm.form.patchValue({
-      cpf: '123.456.789-AB',
+      cpf: '529.982.247-25',
       dataNascimento: '1990-01-01',
       nome: 'Maria da Silva',
       email: 'maria@example.com',

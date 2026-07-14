@@ -37,6 +37,25 @@ import { FormEditComponent, FormEditFormGroup } from '../form-edit/form-edit.com
 
 export type FormMode = 'create' | 'edit' | 'view';
 
+type ProcessoIdInput = number | string | null | undefined;
+
+function parseProcessoIdInput(value: ProcessoIdInput): number | undefined {
+  if (value === null || value === undefined || value === '') {
+    return undefined;
+  }
+
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? Math.trunc(value) : undefined;
+  }
+
+  const normalized = value.trim();
+  if (!/^\d+$/.test(normalized)) {
+    return undefined;
+  }
+
+  return Number.parseInt(normalized, 10);
+}
+
 export type SmartFormSubmitEvent = {
   success: boolean;
   mode: 'create' | 'edit';
@@ -55,7 +74,9 @@ export class SmartFormComponent {
   readonly modo = input<FormMode>('create');
   readonly apiUrl = input<string | undefined>(undefined);
   readonly authToken = input<string | undefined>(undefined);
-  readonly processoId = input<number | undefined>(undefined);
+  readonly processoId = input<number | undefined, ProcessoIdInput>(undefined, {
+    transform: parseProcessoIdInput,
+  });
   readonly inscricaoUuid = input<string | undefined>(undefined);
   readonly actionSubmit = output<SmartFormSubmitEvent>();
 

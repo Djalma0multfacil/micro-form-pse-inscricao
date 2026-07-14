@@ -8,13 +8,13 @@ import {
 } from './personal-data-format.util';
 
 describe('personal-data-format.util', () => {
-  it('should sanitize cpf with uppercase alphanumeric suffix', () => {
-    expect(sanitizeCpf('123.456.789-ab')).toBe('123456789AB');
-    expect(formatCpfForDisplay('123456789ab')).toBe('123.456.789-AB');
+  it('should sanitize cpf keeping only numeric digits', () => {
+    expect(sanitizeCpf('123.456.789-25')).toBe('12345678925');
+    expect(formatCpfForDisplay('12345678925')).toBe('123.456.789-25');
   });
 
-  it('should ignore non-numeric characters before cpf suffix', () => {
-    expect(sanitizeCpf('123a456b789cd')).toBe('123456789CD');
+  it('should ignore non-numeric characters in cpf input', () => {
+    expect(sanitizeCpf('123a456b789c25')).toBe('12345678925');
   });
 
   it('should format telefone for 10 and 11 digits', () => {

@@ -3,7 +3,7 @@ import { Component, input, output } from '@angular/core';
 import { SmartFormComponent, SmartFormSubmitEvent } from './features/smart-form/smart-form.component';
 
 @Component({
-  selector: 'micro-formulario-inscricao',
+  selector: 'micro-formulario-ps-inscricao',
   imports: [CommonModule, SmartFormComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
